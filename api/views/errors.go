@@ -16,12 +16,14 @@ type ErrView struct {
 
 var (
 	ErrMethodNotAllowed = errors.New("Error: Method is not allowed")
+	ErrInvalidSlug      = errors.New("Error: Invalid Slug")
 )
 
 var ErrHTTPStatusMap = map[string]int{
 	ErrMethodNotAllowed.Error(): http.StatusMethodNotAllowed,
 	pkg.ErrNotFound.Error():     http.StatusNotFound,
 	pkg.ErrInvalidSlug.Error():  http.StatusBadRequest,
+	ErrInvalidSlug.Error():      http.StatusBadRequest,
 	pkg.ErrExists.Error():       http.StatusConflict,
 	pkg.ErrNoContent.Error():    http.StatusNotFound,
 	pkg.ErrDatabase.Error():     http.StatusInternalServerError,
