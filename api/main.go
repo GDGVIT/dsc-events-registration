@@ -6,7 +6,9 @@ import (
 	"os"
 	"time"
 
+	"github.com/GDGVIT/dsc-events-registration/api/handler"
 	"github.com/GDGVIT/dsc-events-registration/api/middleware"
+	"github.com/GDGVIT/dsc-events-registration/pkg/participants"
 	"github.com/gorilla/handlers"
 	"github.com/joho/godotenv"
 	"github.com/julienschmidt/httprouter"
@@ -51,6 +53,15 @@ func main() {
 		w.WriteHeader(http.StatusOK)
 		return
 	})
+
+	// make repos
+	participantsRepo := participants.NewMongoRepo(client.Database("dscrec20").Collection("events"))
+
+	// make services
+	participantsService := participants.NewService(participantsRepo)
+
+	// register handlers
+	handler.MakeParticipantHandler(r, participantsService)
 
 	// HTTP(s) binding
 	host := os.Getenv("HOST")
