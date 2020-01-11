@@ -1,3 +1,4 @@
+// +heroku install ./api/main.go
 module github.com/GDGVIT/dsc-events-registration
 
 go 1.13
