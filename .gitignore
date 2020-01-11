@@ -1,4 +1,7 @@
 # Binaries for programs and plugins
+.env
+tmp
+main
 *.exe
 *.exe~
 *.dll
