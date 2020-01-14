@@ -45,3 +45,29 @@ func (r *repo) New(ctx context.Context, participant Participant) (ID interface{}
 	ID = res.InsertedID
 	return ID, err
 }
+
+func (r *repo) FindByEventName(ctx context.Context, eventName string) ([]Participant, error) {
+	filter := bson.M{
+		"eventName": eventName,
+	}
+	cur, err := r.Collection.Find(ctx, filter)
+
+	switch err {
+	case nil:
+		break
+	case mongo.ErrNoDocuments:
+		return nil, nil
+	default:
+		return nil, err
+	}
+	defer cur.Close(ctx)
+	participants := []Participant{}
+
+	for cur.Next(ctx) {
+		participant := Participant{}
+		cur.Decode(&participant)
+		participants = append(participants, participant)
+	}
+
+	return participants, nil
+}

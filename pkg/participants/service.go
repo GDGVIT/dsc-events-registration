@@ -8,6 +8,8 @@ import (
 
 type Service interface {
 	Save(ctx context.Context, participant *Participant) (ID interface{}, err error)
+	CountParticipantsByEvent(ctx context.Context, eventName string) (*int, error)
+	// ShowParticipantsByEvent(ctx context.Context, eventName string) ([]Participant, error)
 }
 
 type service struct {
@@ -35,4 +37,14 @@ func (s *service) Save(ctx context.Context, participant *Participant) (ID interf
 	}
 	return id, nil
 
+}
+
+func (s *service) CountParticipantsByEvent(ctx context.Context, eventName string) (*int, error) {
+	p, err := s.repo.FindByEventName(ctx, eventName)
+
+	if err != nil {
+		return nil, err
+	}
+	count := len(p)
+	return &count, nil
 }

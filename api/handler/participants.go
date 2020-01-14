@@ -1,11 +1,9 @@
 package handler
 
 import (
-	"context"
 	"encoding/json"
 	"log"
 	"net/http"
-	"time"
 
 	"github.com/GDGVIT/dsc-events-registration/api/views"
 	"github.com/GDGVIT/dsc-events-registration/pkg/participants"
@@ -45,8 +43,7 @@ func register(svc participants.Service) httprouter.Handle {
 			return
 		}
 
-		ctx, _ := context.WithTimeout(context.Background(), 10*time.Second)
-		id, err := svc.Save(ctx, p)
+		id, err := svc.Save(r.Context(), p)
 		if err != nil {
 			views.Wrap(err, w)
 			return
@@ -58,10 +55,29 @@ func register(svc participants.Service) httprouter.Handle {
 	}
 }
 
+func viewCount(svc participants.Service) httprouter.Handle {
+	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+		eventName := r.URL.Query().Get("event")
+		count, err := svc.CountParticipantsByEvent(r.Context(), eventName)
+		if err != nil {
+			views.Wrap(err, w)
+			return
+		}
+		if err = json.NewEncoder(w).Encode(map[string]interface{}{
+			"eventName":         eventName,
+			"registrationCount": count,
+		}); err != nil {
+			views.Wrap(err, w)
+			return
+		}
+	}
+}
+
 func MakeParticipantHandler(r *httprouter.Router, svc participants.Service) {
 	r.GET("/api/v1/participants/ping", func(w http.ResponseWriter, r *http.Request, p httprouter.Params) {
 		w.WriteHeader(http.StatusOK)
 		return
 	})
 	r.POST("/api/v1/participants/register", register(svc))
+	r.GET("/api/v1/participants/count", viewCount(svc))
 }
