@@ -58,6 +58,19 @@ func register(svc participants.Service) httprouter.Handle {
 func viewCount(svc participants.Service) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 		eventName := r.URL.Query().Get("event")
+
+		if eventName == "" {
+			data, err := svc.CountParticipantsByEvents(r.Context())
+			if err != nil {
+				views.Wrap(err, w)
+				return
+			}
+			if err = json.NewEncoder(w).Encode(data); err != nil {
+				views.Wrap(err, w)
+				return
+			}
+			return
+		}
 		count, err := svc.CountParticipantsByEvent(r.Context(), eventName)
 		if err != nil {
 			views.Wrap(err, w)

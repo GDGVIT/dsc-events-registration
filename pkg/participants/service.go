@@ -9,6 +9,7 @@ import (
 type Service interface {
 	Save(ctx context.Context, participant *Participant) (ID interface{}, err error)
 	CountParticipantsByEvent(ctx context.Context, eventName string) (*int, error)
+	CountParticipantsByEvents(ctx context.Context) (interface{}, error)
 	// ShowParticipantsByEvent(ctx context.Context, eventName string) ([]Participant, error)
 }
 
@@ -47,4 +48,12 @@ func (s *service) CountParticipantsByEvent(ctx context.Context, eventName string
 	}
 	count := len(p)
 	return &count, nil
+}
+
+func (s *service) CountParticipantsByEvents(ctx context.Context) (interface{}, error) {
+	data, err := s.repo.GroupByEventName(ctx)
+	if err != nil {
+		return nil, err
+	}
+	return data, nil
 }

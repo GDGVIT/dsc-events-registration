@@ -2,6 +2,7 @@ package participants
 
 import (
 	"context"
+	"sync"
 
 	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/mongo"
@@ -70,4 +71,53 @@ func (r *repo) FindByEventName(ctx context.Context, eventName string) ([]Partici
 	}
 
 	return participants, nil
+}
+
+func (r *repo) GroupByEventName(ctx context.Context) (interface{}, error) {
+
+	data, err := r.Collection.Distinct(ctx, "eventName", bson.M{}, nil)
+
+	switch err {
+	case nil:
+		break
+	case mongo.ErrNoDocuments:
+		return nil, nil
+	default:
+		return nil, err
+	}
+
+	var response []interface{}
+	wg := &sync.WaitGroup{}
+	wg.Add(len(data))
+
+	c := make(chan error)
+	for _, v := range data {
+		filter := bson.M{
+			"eventName": v,
+		}
+
+		go func(c chan error) {
+			count, err := r.Collection.CountDocuments(ctx, filter)
+
+			if err != nil {
+				c <- err
+				wg.Done()
+				return
+			}
+			response = append(response, map[string]interface{}{
+				"eventName":         v,
+				"registrationCount": count,
+			})
+			wg.Done()
+		}(c)
+	}
+
+	wg.Wait()
+	select {
+	case err := <-c:
+		return nil, err
+	default:
+		return response, nil
+	}
+
 }

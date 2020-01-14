@@ -7,4 +7,5 @@ type Repository interface {
 	SetPhoneNameReg(ctx context.Context, email, phone, name, reg string) error
 	New(ctx context.Context, participant Participant) (ID interface{}, err error)
 	FindByEventName(ctx context.Context, eventName string) ([]Participant, error)
+	GroupByEventName(ctx context.Context) (interface{}, error)
 }
