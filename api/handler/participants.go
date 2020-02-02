@@ -13,6 +13,7 @@ import (
 
 var AcceptedEvents = [1]string{
 	"WomenTechies20",
+	"SolutionsChallenge",
 }
 
 func isEventAccepted(event string) bool {
