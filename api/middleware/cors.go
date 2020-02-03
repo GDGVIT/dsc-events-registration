@@ -13,10 +13,13 @@ var whiteList = []string{
 }
 
 func CorsEveryWhere(mux http.Handler) http.Handler {
-	c := cors.New(cors.Options{
-		AllowedOrigins:   whiteList,
-		AllowCredentials: true,
-		Debug:            false,
-	})
+	/*
+		c := cors.New(cors.Options{
+			AllowedOrigins:   whiteList,
+			AllowCredentials: true,
+			Debug:            false,
+		})
+	*/
+	c := cors.Default()
 	return c.Handler(mux)
 }
