@@ -9,6 +9,7 @@ import (
 var whiteList = []string{
 	"https://womentechies.dscvit.com",
 	"https://solutions.dscvit.com",
+	"http://localhost:8080",
 }
 
 func CorsEveryWhere(mux http.Handler) http.Handler {
