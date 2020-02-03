@@ -2,8 +2,10 @@ package handler
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"net/http"
+	"os"
 
 	"github.com/GDGVIT/dsc-events-registration/api/views"
 	"github.com/GDGVIT/dsc-events-registration/pkg/participants"
@@ -11,7 +13,7 @@ import (
 	"gopkg.in/validator.v2"
 )
 
-var AcceptedEvents = [1]string{
+var AcceptedEvents = [2]string{
 	"WomenTechies20",
 	"SolutionsChallenge",
 }
@@ -28,6 +30,32 @@ func isEventAccepted(event string) bool {
 func register(svc participants.Service) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
 
+		// verify recaptcha
+		// take captcha token from the request header
+		captchaSecret := os.Getenv("CAPTCHA_SECRET")
+		captchaToken := r.Header.Get("g-recaptcha-response")
+		remoteIP := r.RemoteAddr
+		url := fmt.Sprintf("https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s", captchaSecret, captchaToken, remoteIP)
+		fmt.Println(url)
+
+		resp, err := http.Get(url)
+		if err != nil {
+			views.Wrap(err, w)
+			return
+		}
+		defer resp.Body.Close()
+
+		var i map[string]interface{}
+		if err = json.NewDecoder(resp.Body).Decode(&i); err != nil {
+			views.Wrap(err, w)
+			return
+		}
+		if i["success"] == false {
+			views.Wrap(views.ErrInvalidCaptcha, w)
+			return
+		}
+
+		// captcha verified
 		p := &participants.Participant{}
 		if err := json.NewDecoder(r.Body).Decode(p); err != nil {
 			views.Wrap(err, w)

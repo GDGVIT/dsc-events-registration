@@ -13,6 +13,7 @@ require (
 	github.com/joho/godotenv v1.3.0
 	github.com/julienschmidt/httprouter v1.2.0
 	github.com/kr/pretty v0.1.0 // indirect
+	github.com/mongodb/mongo-tools v0.0.0-20200131212744-44a0f2a3b84a // indirect
 	github.com/pkg/errors v0.8.0 // indirect
 	github.com/rs/cors v1.7.0
 	github.com/sirupsen/logrus v1.4.2
