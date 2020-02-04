@@ -87,6 +87,9 @@ func register(svc participants.Service) httprouter.Handle {
 
 func viewCount(svc participants.Service) httprouter.Handle {
 	return func(w http.ResponseWriter, r *http.Request, params httprouter.Params) {
+
+		w.WriteHeader(http.StatusNotFound)
+		return
 		eventName := r.URL.Query().Get("event")
 
 		if eventName == "" {
