@@ -36,7 +36,8 @@ func register(svc participants.Service) httprouter.Handle {
 		captchaToken := r.Header.Get("g-recaptcha-response")
 		remoteIP := r.RemoteAddr
 		url := fmt.Sprintf("https://www.google.com/recaptcha/api/siteverify?secret=%s&response=%s&remoteip=%s", captchaSecret, captchaToken, remoteIP)
-		fmt.Println(url)
+
+		log.Println(captchaToken)
 
 		resp, err := http.Get(url)
 		if err != nil {
